@@ -1,35 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import "./App.scss";
+import { Login, Register } from "./components/login/index";
 
-function App() {
-  const [count, setCount] = useState(0)
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLogginActive: true
+    };
+  }
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  componentDidMount() {
+    //Add .right by default
+    this.rightSide.classList.add("right");
+  }
+
+  changeState() {
+    const { isLogginActive } = this.state;
+
+    if (isLogginActive) {
+      this.rightSide.classList.remove("right");
+      this.rightSide.classList.add("left");
+    } else {
+      this.rightSide.classList.remove("left");
+      this.rightSide.classList.add("right");
+    }
+    this.setState(prevState => ({ isLogginActive: !prevState.isLogginActive }));
+  }
+
+  render() {
+    const { isLogginActive } = this.state;
+    const current = isLogginActive ? "Register" : "Login";
+    const currentActive = isLogginActive ? "login" : "register";
+    return (
+      <div className="App">
+        <div className="login">
+          <div className="container" ref={ref => (this.container = ref)}>
+            {isLogginActive && (
+              <Login containerRef={ref => (this.current = ref)} />
+            )}
+            {!isLogginActive && (
+              <Register containerRef={ref => (this.current = ref)} />
+            )}
+          </div>
+          <RightSide
+            current={current}
+            currentActive={currentActive}
+            containerRef={ref => (this.rightSide = ref)}
+            onClick={this.changeState.bind(this)}
+          />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
 }
 
-export default App
+const RightSide = props => {
+  return (
+    <div
+      className="right-side"
+      ref={props.containerRef}
+      onClick={props.onClick}
+    >
+      <div className="inner-container">
+        <div className="text">{props.current}</div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
